@@ -4,15 +4,10 @@ pipeline {
     environment {
         IMAGE_NAME = "meghanavalluri/simple-java-app"
         CREDENTIALS_ID = "dockerhub-credentials"
+        KUBECONFIG = "/var/lib/jenkins/.kube/config" // Make sure Jenkins has access
     }
 
     stages {
-        stage('Clone Repository') {
-            steps {
-                git branch: 'main', url: 'https://github.com/meghanavalluri02/practice.git'
-            }
-        }
-
         stage('Build with Maven') {
             steps {
                 sh 'mvn clean install'
