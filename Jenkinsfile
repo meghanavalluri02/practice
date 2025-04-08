@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "meghanavalluri/simple-java-app"
         IMAGE_TAG = "${BUILD_NUMBER}"
-        DOCKER_CREDS = "dockerhub-creds" // Jenkins credentials ID
+        DOCKER_CREDS = "Dockerhub-creds" // Jenkins credentials ID
     }
 
     stages {
