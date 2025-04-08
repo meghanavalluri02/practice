@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "meghanavalluri/simple-java-app"
-        CREDENTIALS_ID = "dockerhub-credentials"
+        CREDENTIALS_ID = "Dockerhub-creds"
         KUBECONFIG = "/var/lib/jenkins/.kube/config" // Make sure Jenkins has access
     }
 
