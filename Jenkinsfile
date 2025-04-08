@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = "meghanavalluri/simple-java-app"
-        CREDENTIALS_ID = "Dockerhub-creds"
-        KUBECONFIG = "/var/lib/jenkins/.kube/config" // Make sure Jenkins has access
+        CREDENTIALS_ID = "dockerhub-creds"
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${IMAGE_NAME}")
+                    dockerImage = docker.build("${IMAGE_NAME}")
                 }
             }
         }
@@ -25,8 +25,8 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', "${CREDENTIALS_ID}") {
-                        docker.image("${IMAGE_NAME}").push("latest")
+                    docker.withRegistry('https://index.docker.io/v1/', CREDENTIALS_ID) {
+                        dockerImage.push("latest")
                     }
                 }
             }
@@ -34,7 +34,9 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f deployment.yaml'
+                withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+                    sh 'kubectl apply -f deployment.yaml'
+                }
             }
         }
     }
