@@ -2,42 +2,58 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "meghanavalluri/simple-java-app"
-        CREDENTIALS_ID = "dockerhub-creds"
-        KUBECONFIG = "/var/lib/jenkins/.kube/config"
+        DOCKER_IMAGE = 'meghanavalluri/simple-java-project:${BUILD_NUMBER}' // Unique versioned image
+        DOCKER_CREDENTIALS = 'Dockerhub-creds' // Jenkins Docker Hub Credentials ID
+       
     }
 
     stages {
-        stage('Build with Maven') {
+        stage('Checkout Code') {
             steps {
-                sh 'mvn clean install'
+                script {
+                    git branch: 'main', url: 'https://github.com/meghanavalluri02/practice.git'
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("${IMAGE_NAME}")
+                    sh "docker build -t ${DOCKER_IMAGE} ."
                 }
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', CREDENTIALS_ID) {
-                        dockerImage.push("latest")
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
+                        sh "docker push ${DOCKER_IMAGE}"
+                        sh "docker logout"
                     }
                 }
             }
         }
 
-        stage('Deploy to Kubernetes') {
+         stage('Deploy to Kubernetes') {
             steps {
-                withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
-                    sh 'kubectl apply -f deployment.yaml'
+                script {
+                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                        sh "kubectl apply -f deployment.yaml"
+                        sh "kubectl apply -f service.yaml"
+                    }
                 }
             }
+        }
+    }
+
+    post {
+        failure {
+            echo "Pipeline failed! Check the logs for details."
+        }
+        success {
+            echo "Deployment successful! 🚀"
         }
     }
 }
