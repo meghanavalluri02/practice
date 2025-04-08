@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'meghanavalluri/simple-java-project:${BUILD_NUMBER}' // Unique versioned image
+        DOCKER_IMAGE = 'meghanavalluri/simple-java-app:${BUILD_NUMBER}' // Unique versioned image
         DOCKER_CREDENTIALS = 'Dockerhub-creds' // Jenkins Docker Hub Credentials ID
        
     }
