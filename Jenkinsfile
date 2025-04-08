@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "meghanavalluri/simple-java-app:${BUILD_NUMBER}" // Unique versioned image
-        DOCKER_CREDENTIALS = 'dockerhub-creds' // Jenkins Docker Hub Credentials ID
+        
     }
 
     stages {
@@ -21,7 +21,7 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh '''
                         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                         docker push ${DOCKER_IMAGE}
