@@ -2,15 +2,15 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "meghanavalluri/simple-java-app"
-        IMAGE_TAG = "${BUILD_NUMBER}"
-        DOCKER_CREDS = "Dockerhub-creds" // Jenkins credentials ID
+        IMAGE_NAME = "meghanavalluri/java-microservice"
+        IMAGE_TAG = "latest"
+        DOCKER_CREDS = "Dockerhub-creds"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/meghanavalluri02/practice.git'
+                checkout scm
             }
         }
 
@@ -60,7 +60,7 @@ pipeline {
             echo "✅ Build and deployment successful!"
         }
         failure {
-            echo "❌ Pipeline failed. Check above logs."
+            echo "❌ Pipeline failed. Check the logs above."
         }
     }
 }
